@@ -1,0 +1,50 @@
+server:
+  port: 8080
+  servlet:
+    context-path: /
+
+spring:
+  application:
+    name: mobile-money-service
+  
+  # H2 Database Configuration
+  datasource:
+    url: jdbc:h2:mem:mobiledb
+    username: sa
+    password: password
+    driverClassName: org.h2.Driver
+  
+  jpa:
+    database-platform: org.hibernate.dialect.H2Dialect
+    hibernate:
+      ddl-auto: update
+    show-sql: true
+  
+  h2:
+    console:
+      enabled: true
+      path: /h2-console
+  
+  # OAuth2 Resource Server Configuration
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          issuer-uri: ${OAUTH_ISSUER_URI:http://localhost:8080/auth/realms/mobile-money}
+          jwk-set-uri: ${OAUTH_JWK_URI:http://localhost:8080/auth/realms/mobile-money/protocol/openid-connect/certs}
+
+# Logging Configuration
+logging:
+  level:
+    root: INFO
+    com.kcb.mobilemoney: DEBUG
+    org.springframework.security: INFO
+    org.springframework.web: INFO
+
+# OpenAPI Documentation
+springdoc:
+  api-docs:
+    path: /v3/api-docs
+  swagger-ui:
+    path: /swagger-ui.html
+    operationsSorter: method 
