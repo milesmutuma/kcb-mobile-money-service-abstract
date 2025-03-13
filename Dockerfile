@@ -1,20 +1,15 @@
-FROM openjdk:11-jdk-slim as build
+# Build stage
+FROM eclipse-temurin:11-jdk-focal as builder
+WORKDIR /app
+COPY .mvn/ .mvn/
+COPY mvnw pom.xml ./
+RUN ./mvnw dependency:go-offline
+COPY src ./src
+RUN ./mvnw clean package -DskipTests
 
-WORKDIR /workspace/app
-
-COPY mvnw .
-COPY .mvn .mvn
-COPY pom.xml .
-COPY src src
-
-RUN ./mvnw install -DskipTests
-
-FROM openjdk:11-jre-slim
-
-VOLUME /tmp
-
-COPY --from=build /workspace/app/target/*.jar app.jar
-
+# Runtime stage
+FROM eclipse-temurin:11-jre-focal
+WORKDIR /app
+COPY --from=builder /app/target/*.jar app.jar
 EXPOSE 8080
-
-ENTRYPOINT ["java", "-jar", "/app.jar"] 
+ENTRYPOINT ["java", "-jar", "app.jar"] 
